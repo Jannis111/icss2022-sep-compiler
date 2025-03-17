@@ -1,11 +1,10 @@
 grammar Expressions;
-
+//parser-regels
 expressions: expression+;
 
 expression:
     multi | sum;
 
-//parser-regels
 multi: (NUMBER MULTI);
 sum: (NUMBER | multi) PLUS (NUMBER | MULTI) (PLUS( NUMBER | multi))*;
 
