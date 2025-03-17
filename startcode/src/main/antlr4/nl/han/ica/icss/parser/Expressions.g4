@@ -1,17 +1,19 @@
 grammar Expressions;
 
-//lexer-regels
-Number: [0-9]+;
-Multi: '*';
-Div: '/';
-Plus: '+';
-Min: '-';
+expressions: expression+;
 
-Operator:[*/+-];
+expression:
+    multi | sum;
+
+//parser-regels
+multi: (NUMBER MULTI);
+sum: (NUMBER | multi) PLUS (NUMBER | MULTI) (PLUS( NUMBER | multi))*;
+
+//lexer-regels
+NUMBER: [0-9]+;
+MULTI: '*';
+PLUS: '+';
+
 
 WS: [ \t\r\n]+ -> skip;
 
-//parser-regels
-
-
-expression:(Number? (Multi|Div|Plus|Min) Number)+;
