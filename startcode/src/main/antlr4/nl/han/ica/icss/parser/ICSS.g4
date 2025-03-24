@@ -46,9 +46,21 @@ ASSIGNMENT_OPERATOR: ':=';
 
 //--- PARSER: ---
 stylesheet: stylerule*;
-stylerule: (tagselector | idselector | classelector) OPEN_BRACE declaration* CLOSE_BRACE;
+stylerule: variableassignment* (tagselector | idselector | classelector) OPEN_BRACE (ifclause | declaration)* CLOSE_BRACE;
 tagselector: LOWER_IDENT;
 idselector: ID_IDENT;
 classelector: CLASS_IDENT;
-declaration: LOWER_IDENT COLON (COLOR | PIXELSIZE) SEMICOLON;
+declaration: LOWER_IDENT COLON (colorliteral | pixelliteral | variablereference | addoperation) SEMICOLON;
+colorliteral: COLOR;
+pixelliteral: PIXELSIZE;
+boolliteral: TRUE | FALSE;
+scalarliteral: SCALAR;
 
+variableassignment: variablereference ASSIGNMENT_OPERATOR (colorliteral | pixelliteral | boolliteral) SEMICOLON;
+variablereference: CAPITAL_IDENT;
+
+addoperation: (variablereference | scalarliteral | multiplyoperation | pixelliteral) PLUS (variablereference | scalarliteral | multiplyoperation | pixelliteral);
+multiplyoperation: (scalarliteral | pixelliteral) MUL (scalarliteral | pixelliteral);
+
+ifclause: IF BOX_BRACKET_OPEN (variablereference) BOX_BRACKET_CLOSE OPEN_BRACE declaration* ifclause* CLOSE_BRACE elseclause?;
+elseclause: ELSE OPEN_BRACE declaration CLOSE_BRACE;
