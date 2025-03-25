@@ -50,7 +50,8 @@ stylerule: variableassignment* (tagselector | idselector | classelector) OPEN_BR
 tagselector: LOWER_IDENT;
 idselector: ID_IDENT;
 classelector: CLASS_IDENT;
-declaration: LOWER_IDENT COLON (colorliteral | pixelliteral | variablereference | addoperation) SEMICOLON;
+declaration: propertyname COLON (colorliteral | pixelliteral | variablereference | addoperation) SEMICOLON;
+propertyname: LOWER_IDENT;
 colorliteral: COLOR;
 pixelliteral: PIXELSIZE;
 boolliteral: TRUE | FALSE;

@@ -69,6 +69,75 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(selector);
 	}
 
+	@Override
+	public void enterTagselector(ICSSParser.TagselectorContext ctx) {
+		TagSelector tagSelector = new TagSelector(ctx.getText());
+		currentContainer.push(tagSelector);
+	}
 
+	@Override
+	public void exitTagselector(ICSSParser.TagselectorContext ctx) {
+		TagSelector selector = (TagSelector) currentContainer.pop();
+		currentContainer.peek().addChild(selector);
+	}
 
+	@Override
+	public void enterDeclaration(ICSSParser.DeclarationContext ctx) {
+		Declaration declaration = new Declaration();
+		currentContainer.push(declaration);
+	}
+
+	@Override
+	public void exitDeclaration(ICSSParser.DeclarationContext ctx) {
+		Declaration declaration = (Declaration) currentContainer.pop();
+		currentContainer.peek().addChild(declaration);
+	}
+
+	@Override
+	public void enterPropertyname(ICSSParser.PropertynameContext ctx) {
+		PropertyName propertyName = new PropertyName(ctx.getText());
+		currentContainer.push(propertyName);
+	}
+
+	@Override
+	public void exitPropertyname(ICSSParser.PropertynameContext ctx) {
+		PropertyName propertyName = (PropertyName) currentContainer.pop();
+		currentContainer.peek().addChild(propertyName);
+	}
+
+	@Override
+	public void enterClasselector(ICSSParser.ClasselectorContext ctx) {
+		ClassSelector classSelector = new ClassSelector(ctx.getText());
+		currentContainer.push(classSelector);
+	}
+
+	@Override
+	public void exitClasselector(ICSSParser.ClasselectorContext ctx) {
+		ClassSelector classSelector = (ClassSelector) currentContainer.pop();
+		currentContainer.peek().addChild(classSelector);
+	}
+
+	@Override
+	public void enterColorliteral(ICSSParser.ColorliteralContext ctx) {
+		ColorLiteral colorLiteral = new ColorLiteral(ctx.getText());
+		currentContainer.push(colorLiteral);
+	}
+
+	@Override
+	public void exitColorliteral(ICSSParser.ColorliteralContext ctx) {
+		ColorLiteral colorLiteral = (ColorLiteral) currentContainer.pop();
+		currentContainer.peek().addChild(colorLiteral);
+	}
+
+	@Override
+	public void enterPixelliteral(ICSSParser.PixelliteralContext ctx) {
+		PixelLiteral pixelLiteral = new PixelLiteral(ctx.getText());
+		currentContainer.push(pixelLiteral);
+	}
+
+	@Override
+	public void exitPixelliteral(ICSSParser.PixelliteralContext ctx) {
+		PixelLiteral pixelLiteral = (PixelLiteral) currentContainer.pop();
+		currentContainer.peek().addChild(pixelLiteral);
+	}
 }
