@@ -178,6 +178,18 @@ public class ASTListener extends ICSSBaseListener {
 	}
 
 	@Override
+	public void enterPercentageliteral(ICSSParser.PercentageliteralContext ctx) {
+		PercentageLiteral percentageLiteral = new PercentageLiteral(ctx.getText());
+		currentContainer.push(percentageLiteral);
+	}
+
+	@Override
+	public void exitPercentageliteral(ICSSParser.PercentageliteralContext ctx) {
+		PercentageLiteral percentageLiteral = (PercentageLiteral) currentContainer.pop();
+		currentContainer.peek().addChild(percentageLiteral);
+	}
+
+	@Override
 	public void enterAddoperation(ICSSParser.AddoperationContext ctx) {
 		AddOperation addOperation = new AddOperation();
 		currentContainer.push(addOperation);
@@ -187,6 +199,18 @@ public class ASTListener extends ICSSBaseListener {
 	public void exitAddoperation(ICSSParser.AddoperationContext ctx) {
 		AddOperation addOperation = (AddOperation) currentContainer.pop();
 		currentContainer.peek().addChild(addOperation);
+	}
+
+	@Override
+	public void enterSubtactoperation(ICSSParser.SubtactoperationContext ctx) {
+		SubtractOperation subtractOperation = new SubtractOperation();
+		currentContainer.push(subtractOperation);
+	}
+
+	@Override
+	public void exitSubtactoperation(ICSSParser.SubtactoperationContext ctx) {
+		SubtractOperation subtractOperation = (SubtractOperation) currentContainer.pop();
+		currentContainer.peek().addChild(subtractOperation);
 	}
 
 	@Override

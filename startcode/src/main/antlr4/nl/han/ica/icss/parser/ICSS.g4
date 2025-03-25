@@ -50,18 +50,21 @@ stylerule: (tagselector | idselector | classelector) OPEN_BRACE (ifclause | decl
 tagselector: LOWER_IDENT;
 idselector: ID_IDENT;
 classelector: CLASS_IDENT;
-declaration: propertyname COLON (colorliteral | pixelliteral | variablereference | addoperation) SEMICOLON;
+declaration: propertyname COLON (colorliteral | pixelliteral | percentageliteral | variablereference | addoperation | subtactoperation) SEMICOLON;
 propertyname: LOWER_IDENT;
+
 colorliteral: COLOR;
 pixelliteral: PIXELSIZE;
 boolliteral: TRUE | FALSE;
 scalarliteral: SCALAR;
+percentageliteral: PERCENTAGE;
 
-variableassignment: variablereference ASSIGNMENT_OPERATOR (colorliteral | pixelliteral | boolliteral) SEMICOLON;
+variableassignment: variablereference ASSIGNMENT_OPERATOR (colorliteral | pixelliteral | boolliteral | percentageliteral) SEMICOLON;
 variablereference: CAPITAL_IDENT;
 
+subtactoperation: (variablereference | scalarliteral | multiplyoperation | pixelliteral) MIN (variablereference | scalarliteral | multiplyoperation | pixelliteral);
 addoperation: (variablereference | scalarliteral | multiplyoperation | pixelliteral) PLUS (variablereference | scalarliteral | multiplyoperation | pixelliteral);
-multiplyoperation: (scalarliteral | pixelliteral) MUL (scalarliteral | pixelliteral);
+multiplyoperation: (scalarliteral | pixelliteral | percentageliteral) MUL (scalarliteral | pixelliteral | percentageliteral);
 
 ifclause: IF BOX_BRACKET_OPEN (variablereference) BOX_BRACKET_CLOSE OPEN_BRACE declaration* ifclause* CLOSE_BRACE elseclause?;
 elseclause: ELSE OPEN_BRACE declaration CLOSE_BRACE;
