@@ -176,4 +176,40 @@ public class ASTListener extends ICSSBaseListener {
 		BoolLiteral boolLiteral = (BoolLiteral) currentContainer.pop();
 		currentContainer.peek().addChild(boolLiteral);
 	}
+
+	@Override
+	public void enterAddoperation(ICSSParser.AddoperationContext ctx) {
+		AddOperation addOperation = new AddOperation();
+		currentContainer.push(addOperation);
+	}
+
+	@Override
+	public void exitAddoperation(ICSSParser.AddoperationContext ctx) {
+		AddOperation addOperation = (AddOperation) currentContainer.pop();
+		currentContainer.peek().addChild(addOperation);
+	}
+
+	@Override
+	public void enterScalarliteral(ICSSParser.ScalarliteralContext ctx) {
+		ScalarLiteral scalarLiteral = new ScalarLiteral(ctx.getText());
+		currentContainer.push(scalarLiteral);
+	}
+
+	@Override
+	public void exitScalarliteral(ICSSParser.ScalarliteralContext ctx) {
+		ScalarLiteral scalarLiteral = (ScalarLiteral) currentContainer.pop();
+		currentContainer.peek().addChild(scalarLiteral);
+	}
+
+	@Override
+	public void enterMultiplyoperation(ICSSParser.MultiplyoperationContext ctx) {
+		MultiplyOperation multiplyOperation = new MultiplyOperation();
+		currentContainer.push(multiplyOperation);
+	}
+
+	@Override
+	public void exitMultiplyoperation(ICSSParser.MultiplyoperationContext ctx) {
+		MultiplyOperation multiplyOperation = (MultiplyOperation) currentContainer.pop();
+		currentContainer.peek().addChild(multiplyOperation);
+	}
 }
