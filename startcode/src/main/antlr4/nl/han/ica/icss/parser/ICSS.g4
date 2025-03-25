@@ -45,8 +45,8 @@ ASSIGNMENT_OPERATOR: ':=';
 
 
 //--- PARSER: ---
-stylesheet: stylerule*;
-stylerule: variableassignment* (tagselector | idselector | classelector) OPEN_BRACE (ifclause | declaration)* CLOSE_BRACE;
+stylesheet: variableassignment* stylerule*;
+stylerule: (tagselector | idselector | classelector) OPEN_BRACE (ifclause | declaration)* CLOSE_BRACE;
 tagselector: LOWER_IDENT;
 idselector: ID_IDENT;
 classelector: CLASS_IDENT;

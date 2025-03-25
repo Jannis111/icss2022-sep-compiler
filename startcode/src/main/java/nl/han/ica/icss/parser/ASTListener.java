@@ -46,6 +46,30 @@ public class ASTListener extends ICSSBaseListener {
 	}
 
 	@Override
+	public void enterVariableassignment(ICSSParser.VariableassignmentContext ctx) {
+		VariableAssignment variableAssignment = new VariableAssignment();
+		currentContainer.push(variableAssignment);
+	}
+
+	@Override
+	public void exitVariableassignment(ICSSParser.VariableassignmentContext ctx) {
+		VariableAssignment variableAssignment = (VariableAssignment) currentContainer.pop();
+		currentContainer.peek().addChild(variableAssignment);
+	}
+
+	@Override
+	public void enterVariablereference(ICSSParser.VariablereferenceContext ctx) {
+		VariableReference variableReference = new VariableReference(ctx.getText());
+		currentContainer.push(variableReference);
+	}
+
+	@Override
+	public void exitVariablereference(ICSSParser.VariablereferenceContext ctx) {
+		VariableReference variableReference = (VariableReference) currentContainer.pop();
+		currentContainer.peek().addChild(variableReference);
+	}
+
+	@Override
 	public void exitStylerule(ICSSParser.StyleruleContext ctx) {
 		Stylerule stylerule = (Stylerule) currentContainer.pop();
 		currentContainer.peek().addChild(stylerule);
@@ -139,5 +163,17 @@ public class ASTListener extends ICSSBaseListener {
 	public void exitPixelliteral(ICSSParser.PixelliteralContext ctx) {
 		PixelLiteral pixelLiteral = (PixelLiteral) currentContainer.pop();
 		currentContainer.peek().addChild(pixelLiteral);
+	}
+
+	@Override
+	public void enterBoolliteral(ICSSParser.BoolliteralContext ctx) {
+		BoolLiteral boolLiteral = new BoolLiteral(ctx.getText());
+		currentContainer.push(boolLiteral);
+	}
+
+	@Override
+	public void exitBoolliteral(ICSSParser.BoolliteralContext ctx) {
+		BoolLiteral boolLiteral = (BoolLiteral) currentContainer.pop();
+		currentContainer.peek().addChild(boolLiteral);
 	}
 }
