@@ -212,4 +212,30 @@ public class ASTListener extends ICSSBaseListener {
 		MultiplyOperation multiplyOperation = (MultiplyOperation) currentContainer.pop();
 		currentContainer.peek().addChild(multiplyOperation);
 	}
+
+	@Override
+	public void enterIfclause(ICSSParser.IfclauseContext ctx) {
+		IfClause ifClause = new IfClause();
+		currentContainer.push(ifClause);
+	}
+
+	@Override
+	public void exitIfclause(ICSSParser.IfclauseContext ctx) {
+		IfClause ifClause = (IfClause) currentContainer.pop();
+		currentContainer.peek().addChild(ifClause);
+	}
+
+	@Override
+	public void enterElseclause(ICSSParser.ElseclauseContext ctx) {
+		ElseClause elseClause = new ElseClause();
+		currentContainer.push(elseClause);
+	}
+
+	@Override
+	public void exitElseclause(ICSSParser.ElseclauseContext ctx) {
+		ElseClause elseClause = (ElseClause) currentContainer.pop();
+		currentContainer.peek().addChild(elseClause);
+	}
+
+
 }
