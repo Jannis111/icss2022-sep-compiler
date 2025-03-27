@@ -52,22 +52,8 @@ idselector: ID_IDENT;
 classelector: CLASS_IDENT;
 declaration: propertyname COLON operation SEMICOLON;
 propertyname: LOWER_IDENT;
-/*
-literal:
-COLOR #colorliteral |
-PIXELSIZE #pixelliteral|
-TRUE #boolliteral|
-FALSE #boolliteral |
-PERCENTAGE #percentageliteral;
-*/
-//colorliteral: COLOR;
-//pixelliteral: PIXELSIZE;
-//boolliteral: TRUE | FALSE;
-//scalarliteral: SCALAR;
-//percentageliteral: PERCENTAGE;
 
 variableassignment: operation ASSIGNMENT_OPERATOR operation SEMICOLON;
-//variablereference: CAPITAL_IDENT;
 
 operation:
     operation MUL operation # multiplyoperation |
@@ -80,15 +66,6 @@ operation:
     FALSE #boolliteral |
     SCALAR #scalarliteral |
     PERCENTAGE #percentageliteral;
-//subtactoperation: (variablereference | scalarliteral | pixelliteral | addoperation) MIN (variablereference | scalarliteral | pixelliteral | addoperation)*;
-//addoperation: (variablereference | scalarliteral | pixelliteral) PLUS (variablereference | scalarliteral | pixelliteral)*;
-//multiplyoperation: (scalarliteral | pixelliteral | percentageliteral | variablereference | subtactoperation | addoperation) MUL (scalarliteral | pixelliteral | percentageliteral | variablereference | subtactoperation | addoperation)*;
 
 ifclause: IF BOX_BRACKET_OPEN operation BOX_BRACKET_CLOSE OPEN_BRACE variableassignment* declaration* ifclause* CLOSE_BRACE elseclause?;
 elseclause: ELSE OPEN_BRACE variableassignment* declaration CLOSE_BRACE;
-
-/*expression:
-    expression '*' expression |
-    expression '+' expression |
-    SCALAR;
-    */
