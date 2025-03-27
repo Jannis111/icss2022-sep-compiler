@@ -46,25 +46,49 @@ ASSIGNMENT_OPERATOR: ':=';
 
 //--- PARSER: ---
 stylesheet: variableassignment* stylerule*;
-stylerule: (tagselector | idselector | classelector) OPEN_BRACE (ifclause | declaration)* CLOSE_BRACE;
+stylerule: (tagselector | idselector | classelector) OPEN_BRACE (variableassignment | ifclause | declaration)* CLOSE_BRACE;
 tagselector: LOWER_IDENT;
 idselector: ID_IDENT;
 classelector: CLASS_IDENT;
-declaration: propertyname COLON (colorliteral | pixelliteral | percentageliteral | variablereference | addoperation | subtactoperation) SEMICOLON;
+declaration: propertyname COLON operation SEMICOLON;
 propertyname: LOWER_IDENT;
+/*
+literal:
+COLOR #colorliteral |
+PIXELSIZE #pixelliteral|
+TRUE #boolliteral|
+FALSE #boolliteral |
+PERCENTAGE #percentageliteral;
+*/
+//colorliteral: COLOR;
+//pixelliteral: PIXELSIZE;
+//boolliteral: TRUE | FALSE;
+//scalarliteral: SCALAR;
+//percentageliteral: PERCENTAGE;
 
-colorliteral: COLOR;
-pixelliteral: PIXELSIZE;
-boolliteral: TRUE | FALSE;
-scalarliteral: SCALAR;
-percentageliteral: PERCENTAGE;
+variableassignment: operation ASSIGNMENT_OPERATOR operation SEMICOLON;
+//variablereference: CAPITAL_IDENT;
 
-variableassignment: variablereference ASSIGNMENT_OPERATOR (colorliteral | pixelliteral | boolliteral | percentageliteral) SEMICOLON;
-variablereference: CAPITAL_IDENT;
+operation:
+    operation MUL operation # multiplyoperation |
+    operation PLUS operation # addoperation|
+    operation MIN operation # subtractoperation|
+    CAPITAL_IDENT #variablereference |
+    COLOR #colorliteral |
+    PIXELSIZE #pixelliteral|
+    TRUE #boolliteral|
+    FALSE #boolliteral |
+    SCALAR #scalarliteral |
+    PERCENTAGE #percentageliteral;
+//subtactoperation: (variablereference | scalarliteral | pixelliteral | addoperation) MIN (variablereference | scalarliteral | pixelliteral | addoperation)*;
+//addoperation: (variablereference | scalarliteral | pixelliteral) PLUS (variablereference | scalarliteral | pixelliteral)*;
+//multiplyoperation: (scalarliteral | pixelliteral | percentageliteral | variablereference | subtactoperation | addoperation) MUL (scalarliteral | pixelliteral | percentageliteral | variablereference | subtactoperation | addoperation)*;
 
-subtactoperation: (variablereference | scalarliteral | multiplyoperation | pixelliteral) MIN (variablereference | scalarliteral | multiplyoperation | pixelliteral);
-addoperation: (variablereference | scalarliteral | multiplyoperation | pixelliteral) PLUS (variablereference | scalarliteral | multiplyoperation | pixelliteral);
-multiplyoperation: (scalarliteral | pixelliteral | percentageliteral) MUL (scalarliteral | pixelliteral | percentageliteral);
+ifclause: IF BOX_BRACKET_OPEN operation BOX_BRACKET_CLOSE OPEN_BRACE variableassignment* declaration* ifclause* CLOSE_BRACE elseclause?;
+elseclause: ELSE OPEN_BRACE variableassignment* declaration CLOSE_BRACE;
 
-ifclause: IF BOX_BRACKET_OPEN (variablereference) BOX_BRACKET_CLOSE OPEN_BRACE declaration* ifclause* CLOSE_BRACE elseclause?;
-elseclause: ELSE OPEN_BRACE declaration CLOSE_BRACE;
+/*expression:
+    expression '*' expression |
+    expression '+' expression |
+    SCALAR;
+    */

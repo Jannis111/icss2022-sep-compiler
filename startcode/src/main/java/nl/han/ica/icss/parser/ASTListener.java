@@ -202,13 +202,13 @@ public class ASTListener extends ICSSBaseListener {
 	}
 
 	@Override
-	public void enterSubtactoperation(ICSSParser.SubtactoperationContext ctx) {
+	public void enterSubtractoperation(ICSSParser.SubtractoperationContext ctx) {
 		SubtractOperation subtractOperation = new SubtractOperation();
 		currentContainer.push(subtractOperation);
 	}
 
 	@Override
-	public void exitSubtactoperation(ICSSParser.SubtactoperationContext ctx) {
+	public void exitSubtractoperation(ICSSParser.SubtractoperationContext ctx) {
 		SubtractOperation subtractOperation = (SubtractOperation) currentContainer.pop();
 		currentContainer.peek().addChild(subtractOperation);
 	}
