@@ -3,43 +3,54 @@ package nl.han.ica.icss.checker;
 import javafx.scene.paint.Color;
 import nl.han.ica.datastructures.IHANLinkedList;
 import nl.han.ica.icss.ast.*;
-import nl.han.ica.icss.ast.literals.ColorLiteral;
-import nl.han.ica.icss.ast.literals.PixelLiteral;
+import nl.han.ica.icss.ast.literals.*;
 import nl.han.ica.icss.ast.types.ExpressionType;
 
 import java.util.HashMap;
-
+import java.util.LinkedList;
 
 
 public class Checker {
 
-    private IHANLinkedList<HashMap<String, ExpressionType>> variableTypes;
+    private LinkedList<HashMap<String, ExpressionType>> variableTypes;
 
     public void check(AST ast) {
-        // variableTypes = new HANLinkedList<>();
+        variableTypes = new LinkedList<>();
         checkStylesheet(ast.root);
     }
 
     private void checkStylesheet(Stylesheet root)
     {
+        variableTypes.add(new HashMap<>());
         for (ASTNode child : root.getChildren())
         {
-            if(child instanceof Stylerule)
+            if (child instanceof VariableAssignment)
+            {
+                checkVariableAssignment((VariableAssignment) child);
+            }else if(child instanceof Stylerule)
             {
                 checkStylerule((Stylerule) child);
+            }else if (child instanceof VariableReference)
+            {
+                checkVariableReference((VariableReference) child);
             }
-
         }
-
     }
 
     private void checkStylerule(Stylerule stylerule)
     {
         for (ASTNode child : stylerule.getChildren())
         {
-            if(child instanceof Declaration)
+            if (child instanceof VariableAssignment)
+            {
+                checkVariableAssignment((VariableAssignment) child);
+
+            }else if(child instanceof Declaration)
             {
                 checkDeclaration((Declaration)child);
+            } else if (child instanceof VariableReference)
+            {
+                checkVariableReference((VariableReference) child);
             }
         }
     }
@@ -59,7 +70,49 @@ public class Checker {
                 node.setError("Color may not consists of pixel");
             }
         }
+
+        if (node.expression instanceof VariableReference)
+        {
+            checkVariableReference((VariableReference) node.expression);
+        }
     }
 
+    private void checkVariableAssignment(VariableAssignment variableAssignment)
+    {
+        ExpressionType expressionType = null;
+        if (variableAssignment.expression instanceof BoolLiteral){
+            expressionType = ExpressionType.BOOL;
+        }
+        else if (variableAssignment.expression instanceof ColorLiteral){
+            expressionType = ExpressionType.COLOR;
+        }
+        else if (variableAssignment.expression instanceof PercentageLiteral){
+            expressionType = ExpressionType.PERCENTAGE;
+        }
+        else if(variableAssignment.expression instanceof PixelLiteral){
+            expressionType = ExpressionType.PIXEL;
+        }
+        else if (variableAssignment.expression instanceof ScalarLiteral) {
+            expressionType = ExpressionType.SCALAR;
+        }else{
+            variableAssignment.setError("is not a literal");
+        }
+        variableTypes.getLast().put(variableAssignment.name.name, expressionType);
+    }
+
+    private void checkVariableReference(VariableReference variableReference)
+    {
+        boolean definedVariableReference = false;
+        for (HashMap<String, ExpressionType> scope : variableTypes)
+        {
+            if (scope.containsKey(variableReference.name)) {
+                definedVariableReference = true;
+                break;
+            }
+        }
+        if(!(definedVariableReference)){
+            variableReference.setError("Variable " + variableReference.name + " does not exist in this scope");
+        }
+    }
 
 }

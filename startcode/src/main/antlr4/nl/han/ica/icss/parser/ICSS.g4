@@ -68,4 +68,4 @@ operation:
     PERCENTAGE #percentageliteral;
 
 ifclause: IF BOX_BRACKET_OPEN operation BOX_BRACKET_CLOSE OPEN_BRACE variableassignment* declaration* ifclause* CLOSE_BRACE elseclause?;
-elseclause: ELSE OPEN_BRACE variableassignment* declaration CLOSE_BRACE;
+elseclause: ELSE OPEN_BRACE variableassignment* declaration* CLOSE_BRACE;
