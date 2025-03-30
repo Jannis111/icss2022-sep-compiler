@@ -6,6 +6,8 @@ import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.*;
 import nl.han.ica.icss.ast.types.ExpressionType;
 
+import java.lang.ref.Reference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -51,6 +53,10 @@ public class Checker {
             } else if (child instanceof VariableReference)
             {
                 checkVariableReference((VariableReference) child);
+            } else if (child instanceof IfClause) {
+                checkIfClause((IfClause) child);
+
+
             }
         }
     }
@@ -112,6 +118,39 @@ public class Checker {
         }
         if(!(definedVariableReference)){
             variableReference.setError("Variable " + variableReference.name + " does not exist in this scope");
+        }
+    }
+
+    private void checkIfClause(IfClause ifClause)
+    {
+        if(ifClause.conditionalExpression instanceof VariableReference)
+        {
+            for(HashMap<String, ExpressionType> hashMap: variableTypes)
+            {
+                if(hashMap.get(((VariableReference) ifClause.conditionalExpression).name) != ExpressionType.BOOL)
+                {
+                    ifClause.setError("Conditional expression is not a boolean");
+                }
+            }
+        }
+        else if (!(ifClause.conditionalExpression instanceof BoolLiteral))
+        {
+            ifClause.setError("Conditional expression is not a boolean");
+        }
+        if(!(ifClause.body.isEmpty()))
+        {
+            checkIfClauseBody(ifClause.body);
+        }
+    }
+
+    private void checkIfClauseBody(ArrayList<ASTNode> body)
+    {
+        for (ASTNode bodyPart : body)
+        {
+            if(bodyPart instanceof IfClause)
+            {
+                checkIfClause((IfClause) bodyPart);
+            }
         }
     }
 
