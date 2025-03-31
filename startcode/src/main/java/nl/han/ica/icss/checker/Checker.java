@@ -4,6 +4,9 @@ import javafx.scene.paint.Color;
 import nl.han.ica.datastructures.IHANLinkedList;
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.*;
+import nl.han.ica.icss.ast.operations.AddOperation;
+import nl.han.ica.icss.ast.operations.MultiplyOperation;
+import nl.han.ica.icss.ast.operations.SubtractOperation;
 import nl.han.ica.icss.ast.types.ExpressionType;
 
 import java.lang.ref.Reference;
@@ -65,13 +68,13 @@ public class Checker {
     {
         if(node.property.name.equals("width")|| node.property.name.equals("height"))
         {
-            if (node.expression instanceof ColorLiteral)
+            if (getExpressionType(node.expression) == ExpressionType.COLOR)
             {
               node.setError("Width may not be a color");
             }
         }else if(node.property.name.equals("color") || node.property.name.equals("background-color"))
         {
-            if (node.expression instanceof PixelLiteral)
+            if (getExpressionType(node.expression) == ExpressionType.PIXEL)
             {
                 node.setError("Color may not consists of pixel");
             }
@@ -81,29 +84,82 @@ public class Checker {
         {
             checkVariableReference((VariableReference) node.expression);
         }
+
+        if(node.expression instanceof Operation)
+        {
+            checkOperation((Operation) node.expression);
+        }
+    }
+
+    private void checkOperation(Operation operation)
+    {
+        if(getExpressionType(operation) == ExpressionType.UNDEFINED)
+        {
+            operation.setError("This operation is wrong.");
+        }
+    }
+
+    private ExpressionType getExpressionType(Expression expression)
+    {
+        if (expression instanceof BoolLiteral) return ExpressionType.BOOL;
+        if (expression instanceof ColorLiteral) return ExpressionType.COLOR;
+        if (expression instanceof PercentageLiteral) return ExpressionType.PERCENTAGE;
+        if (expression instanceof PixelLiteral) return ExpressionType.PIXEL;
+        if (expression instanceof ScalarLiteral) return ExpressionType.SCALAR;
+        if(expression instanceof AddOperation || expression instanceof SubtractOperation)
+        {
+           ExpressionType leftType = getExpressionType(((Operation) expression).lhs);
+           ExpressionType rightType = getExpressionType(((Operation) expression).rhs);
+
+           if(leftType == rightType)
+           {
+               return leftType;
+           }else
+           {
+               return ExpressionType.UNDEFINED;
+           }
+        }
+        else if(expression instanceof MultiplyOperation)
+        {
+            ExpressionType leftType = getExpressionType(((Operation) expression).lhs);
+            ExpressionType rightType = getExpressionType(((Operation) expression).rhs);
+
+            if (leftType == ExpressionType.SCALAR || rightType == ExpressionType.SCALAR) {
+                if (leftType == ExpressionType.SCALAR) {
+                    return rightType;
+                } else {
+                    return leftType;
+                }
+            } else {
+                return ExpressionType.UNDEFINED;
+            }
+
+        }
+
+        if(expression instanceof VariableReference)
+        {
+            for (HashMap<String, ExpressionType> hashMap : variableTypes)
+            {
+                if(hashMap.containsKey(((VariableReference)expression).name))
+                {
+                    return hashMap.get(((VariableReference)expression).name);
+                }
+            }
+        }
+
+        return ExpressionType.UNDEFINED;
     }
 
     private void checkVariableAssignment(VariableAssignment variableAssignment)
     {
-        ExpressionType expressionType = null;
-        if (variableAssignment.expression instanceof BoolLiteral){
-            expressionType = ExpressionType.BOOL;
-        }
-        else if (variableAssignment.expression instanceof ColorLiteral){
-            expressionType = ExpressionType.COLOR;
-        }
-        else if (variableAssignment.expression instanceof PercentageLiteral){
-            expressionType = ExpressionType.PERCENTAGE;
-        }
-        else if(variableAssignment.expression instanceof PixelLiteral){
-            expressionType = ExpressionType.PIXEL;
-        }
-        else if (variableAssignment.expression instanceof ScalarLiteral) {
-            expressionType = ExpressionType.SCALAR;
-        }else{
+        ExpressionType expressionType = getExpressionType(variableAssignment.expression) ;
+        if(expressionType == ExpressionType.UNDEFINED)
+        {
             variableAssignment.setError("is not a literal");
+        }else
+        {
+            variableTypes.getLast().put(variableAssignment.name.name, expressionType);
         }
-        variableTypes.getLast().put(variableAssignment.name.name, expressionType);
     }
 
     private void checkVariableReference(VariableReference variableReference)
