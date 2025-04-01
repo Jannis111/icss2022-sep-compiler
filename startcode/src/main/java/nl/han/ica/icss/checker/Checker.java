@@ -58,8 +58,6 @@ public class Checker {
                 checkVariableReference((VariableReference) child);
             } else if (child instanceof IfClause) {
                 checkIfClause((IfClause) child);
-
-
             }
         }
     }
@@ -152,8 +150,12 @@ public class Checker {
 
     private void checkVariableAssignment(VariableAssignment variableAssignment)
     {
-        ExpressionType expressionType = getExpressionType(variableAssignment.expression) ;
-        if(expressionType == ExpressionType.UNDEFINED)
+        ExpressionType expressionType = getExpressionType(variableAssignment.expression);
+        if(variableAssignment.expression instanceof Operation)
+        {
+            checkOperation((Operation) variableAssignment.expression);
+        }
+        else if(expressionType == ExpressionType.UNDEFINED)
         {
             variableAssignment.setError("is not a literal");
         }else
@@ -177,35 +179,62 @@ public class Checker {
         }
     }
 
+    //Checks everything in an ifClause
     private void checkIfClause(IfClause ifClause)
     {
-        if(ifClause.conditionalExpression instanceof VariableReference)
-        {
-            for(HashMap<String, ExpressionType> hashMap: variableTypes)
-            {
-                if(hashMap.get(((VariableReference) ifClause.conditionalExpression).name) != ExpressionType.BOOL)
-                {
-                    ifClause.setError("Conditional expression is not a boolean");
-                }
-            }
-        }
-        else if (!(ifClause.conditionalExpression instanceof BoolLiteral))
-        {
-            ifClause.setError("Conditional expression is not a boolean");
-        }
+        ifClauseExpressionBoolean(ifClause.conditionalExpression);
+
         if(!(ifClause.body.isEmpty()))
         {
-            checkIfClauseBody(ifClause.body);
+            checkClauseBody(ifClause.body);
+        }
+        if(ifClause.elseClause != null)
+        {
+            if(!(ifClause.elseClause.body.isEmpty()))
+            {
+                checkClauseBody(ifClause.elseClause.body);
+            }
         }
     }
 
-    private void checkIfClauseBody(ArrayList<ASTNode> body)
+    //checks if the ifClause expression is a boolean
+    private void ifClauseExpressionBoolean(Expression expression)
+    {
+        if(expression instanceof VariableReference)
+        {
+            for(HashMap<String, ExpressionType> hashMap: variableTypes)
+            {
+                if(hashMap.get(((VariableReference) expression).name) != ExpressionType.BOOL)
+                {
+                    expression.setError("Conditional expression is not a boolean");
+                }
+            }
+        }
+        else if (!(expression instanceof BoolLiteral))
+        {
+            expression.setError("Conditional expression is not a boolean");
+        }
+    }
+
+    //checks the body of an if and else clause
+    private void checkClauseBody(ArrayList<ASTNode> body)
     {
         for (ASTNode bodyPart : body)
         {
             if(bodyPart instanceof IfClause)
             {
                 checkIfClause((IfClause) bodyPart);
+            }
+            else if (bodyPart instanceof Declaration)
+            {
+                checkDeclaration((Declaration) bodyPart);
+            }
+            else if (bodyPart instanceof VariableAssignment) {
+                checkVariableAssignment((VariableAssignment) bodyPart);
+            }
+            else if (bodyPart instanceof VariableReference)
+            {
+             checkVariableReference((VariableReference) bodyPart);
             }
         }
     }
