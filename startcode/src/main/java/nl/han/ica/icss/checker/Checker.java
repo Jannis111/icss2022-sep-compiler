@@ -40,10 +40,12 @@ public class Checker {
                 checkVariableReference((VariableReference) child);
             }
         }
+        variableTypes.removeLast();
     }
 
     private void checkStylerule(Stylerule stylerule)
     {
+        variableTypes.add(new HashMap<>());
         for (ASTNode child : stylerule.getChildren())
         {
             if (child instanceof VariableAssignment)
@@ -60,6 +62,7 @@ public class Checker {
                 checkIfClause((IfClause) child);
             }
         }
+        variableTypes.removeLast();
     }
 
     private void checkDeclaration(Declaration node)
@@ -91,7 +94,7 @@ public class Checker {
 
     private void checkOperation(Operation operation)
     {
-        if(getExpressionType(operation) == ExpressionType.UNDEFINED)
+        if(getExpressionType(operation) == ExpressionType.UNDEFINED || getExpressionType(operation) == ExpressionType.COLOR)
         {
             operation.setError("This operation is wrong.");
         }
@@ -155,10 +158,12 @@ public class Checker {
         {
             checkOperation((Operation) variableAssignment.expression);
         }
-        else if(expressionType == ExpressionType.UNDEFINED)
+
+        if(expressionType == ExpressionType.UNDEFINED)
         {
-            variableAssignment.setError("is not a literal");
-        }else
+            variableAssignment.setError("variableAssignment type is UNDEFINED");
+        }
+        else
         {
             variableTypes.getLast().put(variableAssignment.name.name, expressionType);
         }
@@ -167,6 +172,7 @@ public class Checker {
     private void checkVariableReference(VariableReference variableReference)
     {
         boolean definedVariableReference = false;
+
         for (HashMap<String, ExpressionType> scope : variableTypes)
         {
             if (scope.containsKey(variableReference.name)) {
@@ -195,6 +201,7 @@ public class Checker {
                 checkClauseBody(ifClause.elseClause.body);
             }
         }
+
     }
 
     //checks if the ifClause expression is a boolean
@@ -204,7 +211,8 @@ public class Checker {
         {
             for(HashMap<String, ExpressionType> hashMap: variableTypes)
             {
-                if(hashMap.get(((VariableReference) expression).name) != ExpressionType.BOOL)
+
+                if(hashMap.get(((VariableReference) expression).name) != ExpressionType.BOOL && hashMap.containsKey(((VariableReference) expression).name))
                 {
                     expression.setError("Conditional expression is not a boolean");
                 }
@@ -219,6 +227,7 @@ public class Checker {
     //checks the body of an if and else clause
     private void checkClauseBody(ArrayList<ASTNode> body)
     {
+        variableTypes.add(new HashMap<>());
         for (ASTNode bodyPart : body)
         {
             if(bodyPart instanceof IfClause)
@@ -232,11 +241,11 @@ public class Checker {
             else if (bodyPart instanceof VariableAssignment) {
                 checkVariableAssignment((VariableAssignment) bodyPart);
             }
-            else if (bodyPart instanceof VariableReference)
-            {
-             checkVariableReference((VariableReference) bodyPart);
+            else if (bodyPart instanceof VariableReference) {
+                checkVariableReference((VariableReference) bodyPart);
             }
         }
+        variableTypes.removeLast();
     }
 
 }
