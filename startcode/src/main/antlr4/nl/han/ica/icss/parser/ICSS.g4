@@ -57,8 +57,8 @@ variableassignment: operation ASSIGNMENT_OPERATOR operation SEMICOLON;
 
 operation:
     operation MUL operation # multiplyoperation |
-    operation PLUS operation # addoperation|
     operation MIN operation # subtractoperation|
+    operation PLUS operation # addoperation|
     CAPITAL_IDENT #variablereference |
     COLOR #colorliteral |
     PIXELSIZE #pixelliteral|
