@@ -62,7 +62,9 @@ public class Evaluator implements Transform {
             }
             else if (child instanceof IfClause)
             {
-                applyIfClause((IfClause) child);
+                ArrayList<ASTNode> children = node.getChildren();
+                int index = children.indexOf((IfClause) child);
+                applyIfClause((IfClause) child, node, index);
             }
         }
 
@@ -76,25 +78,26 @@ public class Evaluator implements Transform {
     }
 
 
-    private void applyIfClause(IfClause ifClause)
+    private void applyIfClause(IfClause ifClause, ASTNode parentNode, int index)
     {
-//        if(((BoolLiteral)ifClause.conditionalExpression).value)
-//        {
         if(ifClause.conditionalExpression instanceof VariableReference)
         {
-           ifClause.conditionalExpression = evalExpression((VariableReference)ifClause.conditionalExpression);
+            ifClause.conditionalExpression = evalExpression((VariableReference)ifClause.conditionalExpression);
         }
-
+        if(((BoolLiteral)ifClause.conditionalExpression).value)
+        {
             if (!(ifClause.body.isEmpty()))
             {
-                evalClauseBody(ifClause.body);
+                evalClauseBody(ifClause.body, parentNode, index);
+                parentNode.removeChild(ifClause);
             }
-//        }
+        }
         else if(ifClause.elseClause != null)
         {
             if (!(ifClause.elseClause.body.isEmpty()))
             {
-                evalClauseBody(ifClause.elseClause.body);
+                evalClauseBody(ifClause.elseClause.body, parentNode, index);
+                parentNode.removeChild(ifClause);
             }
         }
 
@@ -111,7 +114,7 @@ public class Evaluator implements Transform {
     }
 
 
-    private void evalClauseBody(ArrayList<ASTNode> body)
+    private void evalClauseBody(ArrayList<ASTNode> body, ASTNode parentNode, int index)
     {
         variableValues.add(0, new HashMap<>());
 
@@ -119,7 +122,7 @@ public class Evaluator implements Transform {
         {
             if (bodyPart instanceof IfClause)
             {
-                applyIfClause((IfClause) bodyPart);
+                applyIfClause((IfClause) bodyPart, parentNode, index);
             }
             else if (bodyPart instanceof VariableAssignment)
             {
@@ -127,7 +130,11 @@ public class Evaluator implements Transform {
             }
             else if (bodyPart instanceof Declaration)
             {
+
+              //  parentNode.removeChild(bodyPart);
                 applyDeclartion((Declaration) bodyPart);
+                ((Stylerule) parentNode).addChild(bodyPart, index);
+                index++;
             }
         }
 

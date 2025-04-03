@@ -39,6 +39,16 @@ public class Stylerule extends ASTNode {
 
 		return this;
     }
+
+	public ASTNode addChild(ASTNode child, int index) {
+		if(child instanceof Selector)
+			selectors.add((Selector) child);
+		else
+			body.add(index, child);
+
+		return this;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -47,6 +57,12 @@ public class Stylerule extends ASTNode {
 		Stylerule stylerule = (Stylerule) o;
 		return Objects.equals(selectors, stylerule.selectors) &&
 				Objects.equals(body, stylerule.body);
+	}
+
+	@Override
+	public ASTNode removeChild(ASTNode child) {
+		body.remove(child);
+		return super.removeChild(child);
 	}
 
 	@Override
