@@ -26,7 +26,7 @@ public class Checker {
 
     private void checkStylesheet(Stylesheet root)
     {
-        variableTypes.add(new HashMap<>());
+        variableTypes.add(0, new HashMap<>());
         for (ASTNode child : root.getChildren())
         {
             if (child instanceof VariableAssignment)
@@ -40,12 +40,12 @@ public class Checker {
                 checkVariableReference((VariableReference) child);
             }
         }
-        variableTypes.removeLast();
+        variableTypes.removeFirst();
     }
 
     private void checkStylerule(Stylerule stylerule)
     {
-        variableTypes.add(new HashMap<>());
+        variableTypes.add(0, new HashMap<>());
         for (ASTNode child : stylerule.getChildren())
         {
             if (child instanceof VariableAssignment)
@@ -62,7 +62,7 @@ public class Checker {
                 checkIfClause((IfClause) child);
             }
         }
-        variableTypes.removeLast();
+        variableTypes.removeFirst();
     }
 
     private void checkDeclaration(Declaration node)
@@ -165,7 +165,7 @@ public class Checker {
         }
         else
         {
-            variableTypes.getLast().put(variableAssignment.name.name, expressionType);
+            variableTypes.getFirst().put(variableAssignment.name.name, expressionType);
         }
     }
 
@@ -207,15 +207,20 @@ public class Checker {
     //checks if the ifClause expression is a boolean
     private void ifClauseExpressionBoolean(Expression expression)
     {
+        boolean variableReferenceIsBoolean = false;
         if(expression instanceof VariableReference)
         {
             for(HashMap<String, ExpressionType> hashMap: variableTypes)
             {
 
-                if(hashMap.get(((VariableReference) expression).name) != ExpressionType.BOOL && hashMap.containsKey(((VariableReference) expression).name))
+                if(hashMap.get(((VariableReference) expression).name) == ExpressionType.BOOL)
                 {
-                    expression.setError("Conditional expression is not a boolean");
+                    variableReferenceIsBoolean = true;
                 }
+            }
+            if(!variableReferenceIsBoolean)
+            {
+                expression.setError("The variable you are using does not exist in this scope or is not of type boolean");
             }
         }
         else if (!(expression instanceof BoolLiteral))
@@ -227,7 +232,7 @@ public class Checker {
     //checks the body of an if and else clause
     private void checkClauseBody(ArrayList<ASTNode> body)
     {
-        variableTypes.add(new HashMap<>());
+        variableTypes.add(0, new HashMap<>());
         for (ASTNode bodyPart : body)
         {
             if(bodyPart instanceof IfClause)
@@ -245,7 +250,7 @@ public class Checker {
                 checkVariableReference((VariableReference) bodyPart);
             }
         }
-        variableTypes.removeLast();
+        variableTypes.removeFirst();
     }
 
 }

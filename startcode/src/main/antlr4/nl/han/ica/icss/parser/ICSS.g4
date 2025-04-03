@@ -45,7 +45,7 @@ ASSIGNMENT_OPERATOR: ':=';
 
 
 //--- PARSER: ---
-stylesheet: variableassignment* stylerule*;
+stylesheet: (variableassignment | stylerule)*;
 stylerule: (tagselector | idselector | classelector) OPEN_BRACE (variableassignment | ifclause | declaration)* CLOSE_BRACE;
 tagselector: LOWER_IDENT;
 idselector: ID_IDENT;
@@ -67,5 +67,5 @@ operation:
     SCALAR #scalarliteral |
     PERCENTAGE #percentageliteral;
 
-ifclause: IF BOX_BRACKET_OPEN operation BOX_BRACKET_CLOSE OPEN_BRACE variableassignment* declaration* ifclause* CLOSE_BRACE elseclause?;
-elseclause: ELSE OPEN_BRACE ifclause* variableassignment* declaration* CLOSE_BRACE;
+ifclause: IF BOX_BRACKET_OPEN operation BOX_BRACKET_CLOSE OPEN_BRACE (variableassignment | declaration | ifclause)* CLOSE_BRACE elseclause?;
+elseclause: ELSE OPEN_BRACE (variableassignment | declaration | ifclause)* CLOSE_BRACE;
